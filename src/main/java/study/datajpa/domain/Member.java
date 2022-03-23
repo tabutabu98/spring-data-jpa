@@ -11,6 +11,10 @@ import static javax.persistence.FetchType.*;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "username", "age"})   // 연관관계 필드는 안하는것이 좋음
+@NamedQuery(
+        name = "Member.findByUsername",
+        query = "select m from Member m where m.username = :username"
+)
 public class Member {
 
     @Id
