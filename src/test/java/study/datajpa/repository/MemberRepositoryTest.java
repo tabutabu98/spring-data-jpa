@@ -13,6 +13,8 @@ import study.datajpa.domain.Member;
 import study.datajpa.domain.Team;
 import study.datajpa.dto.MemberDto;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,8 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
     @Autowired
     TeamRepository teamRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     public void testMember() {
@@ -232,5 +236,32 @@ class MemberRepositoryTest {
 ////        assertThat(page.getTotalPages()).isEqualTo(2);  // 전체 페이지 개수
 //        assertThat(page.isFirst()).isTrue();    // 첫번째 항목인가?
 //        assertThat(page.hasNext()).isTrue();    // 다음 페이지가 있는가?
+    }
+
+    @Test
+    public void bulkUpdate() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        // when
+        /**
+         * 벌크 연산은 DB에 바로 쿼리를 날려서 값을 변경하기 때문에 영속성 컨텍스트에서는 변경감지를하지 못한다.
+         * 따라서 벌크 연산을 할 경우 flush와 clear을 진행해야한다.
+         * 혹은 JpaRepository의 @Modifiying에서 clearAutomatically 옵션을 true로 해둔다.
+         */
+        int resultCount = memberRepository.bulkAgePlus(20);
+//        em.flush();
+//        em.clear();
+
+        List<Member> result = memberRepository.findByUsername("member5");
+        Member member5 = result.get(0);
+        System.out.println("member5 = " + member5.getAge());
+
+        // then
+        assertThat(resultCount).isEqualTo(3);
     }
 }

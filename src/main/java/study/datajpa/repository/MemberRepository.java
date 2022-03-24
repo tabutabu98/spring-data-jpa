@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.domain.Member;
@@ -50,4 +51,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query(value = "select m from Member m left join m.team t",
             countQuery = "select count(m) from Member m")
     Page<Member> findByAge(int age, Pageable pageable);
+
+    /**
+     * 변경감지를 위해 @Modifying을 꼭 넣어줘야 한다.
+     * clearAutomatically 는 em.clear를 별도로 붙이지 않아도 자동적으로 그 매커니즘을 실행시켜 준다.
+     */
+    @Modifying(clearAutomatically = true)
+    @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
+    int bulkAgePlus(@Param("age") int age);
 }
