@@ -318,8 +318,40 @@ class MemberRepositoryTest {
             System.out.println("member.teamClass = " + member.getTeam().getClass());
             System.out.println("member.team = " + member.getTeam().getName());
         }
+    }
 
-        // then
+    @Test
+    public void queryHint() {
+        // given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
 
+//        // when
+//        // 변경감지가 일어남
+//        Member findMember = memberRepository.findById(member1.getId()).get();
+//        findMember.setUsername("member2");
+//        em.flush();
+//        em.clear();
+
+        // when 'QueryHint', 성능을 최적화하기 위한 기능(hibernate)
+        // 변경감지가 일어남
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("member2");
+        System.out.println("findMember = " + findMember.getUsername());
+        em.flush();
+        em.clear();
+    }
+
+    @Test
+    public void lock() {
+        // given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        // when
+        // 변경감지가 일어남
+        List<Member> result = memberRepository.findLockByUsername("member1");
     }
 }
