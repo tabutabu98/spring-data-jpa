@@ -32,6 +32,8 @@ class MemberRepositoryTest {
     TeamRepository teamRepository;
     @PersistenceContext
     EntityManager em;
+    @Autowired
+    MemberQueryRepository memberQueryRepository;
 
     @Test
     public void testMember() {
@@ -353,5 +355,17 @@ class MemberRepositoryTest {
         // when
         // 변경감지가 일어남
         List<Member> result = memberRepository.findLockByUsername("member1");
+    }
+
+    @Test
+    public void callCustom() {
+        // given
+        List<Member> result = memberRepository.findMemberCustom();
+
+        // when
+
+
+        // then
+
     }
 }
