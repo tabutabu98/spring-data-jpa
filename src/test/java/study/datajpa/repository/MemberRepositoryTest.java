@@ -1,6 +1,5 @@
 package study.datajpa.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -366,16 +364,7 @@ class MemberRepositoryTest {
     @Test
     public void specBasic() throws Exception {
         // given
-        Team teamA = new Team("teamA");
-        em.persist(teamA);
-
-        Member m1 = new Member("m1", 0, teamA);
-        Member m2 = new Member("m2", 0, teamA);
-        em.persist(m1);
-        em.persist(m2);
-
-        em.flush();
-        em.clear();
+        createTeamAndMember();
 
         // when
         Specification<Member> spec = MemberSpec.username("m1").and(MemberSpec.teamName("teamA"));
@@ -388,16 +377,7 @@ class MemberRepositoryTest {
     @Test
     public void queryByExample() throws Exception {
         // given
-        Team teamA = new Team("teamA");
-        em.persist(teamA);
-
-        Member m1 = new Member("m1", 0, teamA);
-        Member m2 = new Member("m2", 0, teamA);
-        em.persist(m1);
-        em.persist(m2);
-
-        em.flush();
-        em.clear();
+        createTeamAndMember();
 
         // when
         /**
@@ -417,6 +397,57 @@ class MemberRepositoryTest {
 
         // then
         assertThat(result.get(0).getUsername()).isEqualTo("m1");
-            
+    }
+
+    @Test
+    public void projections() throws Exception {
+        // given
+        createTeamAndMember();
+
+        // when
+        List<UsernameOnly> result = memberRepository.findProjectionsByUsername("m1");
+        for (UsernameOnly usernameOnly : result) {
+            System.out.println("usernameOnly = " + usernameOnly.getUsername());
+        }
+    }
+
+    @Test
+    public void projections2() throws Exception {
+        // given
+        createTeamAndMember();
+
+        // when
+        List<UsernameOnlyDto> result = memberRepository.findProjections2ByUsername("m1", UsernameOnlyDto.class);
+        for (UsernameOnlyDto usernameOnlyDto : result) {
+            System.out.println("usernameOnlyDto = " + usernameOnlyDto.getUsername());
+        }
+    }
+
+    @Test
+    public void projections3() throws Exception {
+        // given
+        createTeamAndMember();
+
+        // when
+        List<NestedClosedProjections> result = memberRepository.findProjections2ByUsername("m1", NestedClosedProjections.class);
+        for (NestedClosedProjections nestedClosedProjections : result) {
+            String username = nestedClosedProjections.getUsername();
+            System.out.println("username = " + username);
+            String teamName = nestedClosedProjections.getTeam().getName();
+            System.out.println("teamName = " + teamName);
+        }
+    }
+
+    private void createTeamAndMember() {
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member m1 = new Member("m1", 0, teamA);
+        Member m2 = new Member("m2", 0, teamA);
+        em.persist(m1);
+        em.persist(m2);
+
+        em.flush();
+        em.clear();
     }
 }
