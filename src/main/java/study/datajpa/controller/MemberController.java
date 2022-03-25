@@ -45,10 +45,10 @@ public class MemberController {
     /**
      * @PostConstruct 은 호출되지 않아도 실행된다.
      */
-    @PostConstruct
-    public void init() {
-        for (int i = 0; i < 100; i++) {
-            memberRepository.save(new Member("user" + i, i));
-        }
-    }
+//    @PostConstruct
+//    public void init() {
+//        for (int i = 0; i < 100; i++) {
+//            memberRepository.save(new Member("user" + i, i));
+//        }
+//    }
 }

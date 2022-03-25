@@ -16,8 +16,8 @@ import static javax.persistence.FetchType.*;
         query = "select m from Member m where m.username = :username"
 )
 @NamedEntityGraph(name = "Member.all", attributeNodes = @NamedAttributeNode("team"))
-public class Member {
-//public class Member extends BaseEntity {
+//public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue
